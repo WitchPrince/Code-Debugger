@@ -16,7 +16,10 @@
 #define DATABASE "/usr/local/share/error_finder_database/"
 #define KERNEL	"/usr/local/share/error_finder_database/checkpatch.pl"
 
+//Global Variables
+extern bool secretFiles;
+
 //Functions
-void list_directory(bool secretFiles); 
+void list_directory(); 
 
 #endif
