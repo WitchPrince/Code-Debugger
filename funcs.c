@@ -1,21 +1,42 @@
 #include "settings.h"
 
-void list_directory(){
-	DIR *dir = opendir(".");
-	if(dir == NULL){
-		fprintf(stderr, "Folder couldn't opened!");
-		exit(1);
+char **parser(char *target){
+	DIR *dir;
+	if(target[0] == '.'){
+		dir = opendir(".");
+		if(dir == NULL){
+			fprintf(stderr, "Folder couldn't opened!");
+			exit(1);
+		}
 	}
 
+	else{
+		char *db = malloc(strlen(DATABASE) + strlen(target));
+		snprintf(db, sizeof(db), "./");
+		snprintf(db, sizeof(db), DATABASE);
+		snprintf(db, sizeof(db), target);
+	
+		dir = opendir(db);
+		if(dir == NULL){
+			fprintf(stderr, "Folder couldn't opened!");
+			free(db);
+			exit(1);
+		}
+	}
 	struct dirent *dp;
 	int count = 0, capacity = 64;
 	
 	char **file_names = malloc(sizeof(char*) * capacity);
 	if(file_names == NULL){
 		fprintf(stderr, "Malloc stopped working! It didn't save file_names variable in funcs.c file.");
+		exit(1);
 	}
 
 	while((dp = readdir(dir)) != NULL){
+
+		if(strcmp(dp->d_name, ".") == 0 || strcmp(dp->d_name, "..") == 0)
+			continue;
+
 		if(!secretFiles && dp->d_name[0] == '.')
 			continue;
 
@@ -32,15 +53,25 @@ void list_directory(){
 		}
 
 		file_names[count] = strdup(dp->d_name);
-		if(file_names[count] != NULL){
-			printf("%s\n", file_names[count]);
-			count++;
-		}
+		
+		if(file_names[count] != NULL) count++;
 	}
 	closedir(dir);
 
-	for(int i = 0; i < count; i++){
-		free(file_names[i]);
+	file_names[count] = NULL;
+
+	return file_names;
+}
+
+char *default_file(char *file_name){
+	int error_handler = system(file_name);
+
+	if(error_handler == -1){
+		fprintf(stderr, "Script couldn't started. Check script file permissions!");
+		strcpy(file_name, "."KERNEL);
+		
+		return file_name;
 	}
-	free(file_names);
+
+	return file_name;
 }
