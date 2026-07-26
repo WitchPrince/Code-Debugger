@@ -62,16 +62,3 @@ char **parser(char *target){
 
 	return file_names;
 }
-
-char *default_file(char *file_name){
-	int error_handler = system(file_name);
-
-	if(error_handler == -1){
-		fprintf(stderr, "Script couldn't started. Check script file permissions!");
-		strcpy(file_name, "."KERNEL);
-		
-		return file_name;
-	}
-
-	return file_name;
-}
