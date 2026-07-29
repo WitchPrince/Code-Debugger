@@ -1,6 +1,7 @@
 #include "../settings.h"
 
 int settings_menu(){
+	FILE *settings_file = NULL;
 	int decision, main_decision;
 	while(1){
 		printf("\n(1) File search format\n(2) Change default script file\n(3) Add a script file to database\n(4) Delete a script file from database\n(5) Exit\nDecision: ");
@@ -13,51 +14,27 @@ int settings_menu(){
 			printf("\n==================================\n");
 				
 			if(decision == 1){
-				FILE *settings_file = fopen(SETTINGS_FILE, "r");
+				settings_file = fopen(SETTINGS_FILE, "w");
 				if(settings_file == NULL){
-					settings_file = fopen(SETTINGS_FILE, "w");
-					if(settings_file == NULL){
-						fprintf(stderr, "Settings file couldn't opened.\n");
-						return ERROR;
-					}
-					W_SETTINGS("name", KERNEL);
+					fprintf(stderr, "Settings file couldn't opened.\n");
+					return ERROR;
 				}
+				fprintf(settings_file, "File search style: name\nDefault file: %s\n", file_name);
 
-				else{
-					R_SETTINGS(search_style, file_name);
-
-					if(strcmp(search_style, "name") != 0){
-						fclose(settings_file);
-						settings_file = fopen(SETTINGS_FILE, "w");
-						W_SETTINGS("name", file_name);	
-					}
-				}
 				fclose(settings_file);
 				printf("\nFrom now on files will be select from their exact name.\n");
 				return SUCCESS;
 			}
 
 			else if(decision == 2){
-				FILE *settings_file = fopen(SETTINGS_FILE, "r");
+				settings_file = fopen(SETTINGS_FILE, "w");
 				if(settings_file == NULL){
-					settings_file = fopen(SETTINGS_FILE, "w");
-					if(settings_file == NULL){
-						fprintf(stderr, "Settings file couldn't opened.\n");
-						return ERROR;
-					}
-					W_SETTINGS("number", KERNEL);
+					fprintf(stderr, "Settings file couldn't opened.\n");
+					return ERROR;
 				}
+				fprintf(settings_file, "File search style: number\nDefault file: %s", file_name);
 
-				else{
-					R_SETTINGS(search_style, file_name);
-					if(strcmp(search_style, "number") != 0){
-						fclose(settings_file);
-						settings_file = fopen(SETTINGS_FILE, "w");
-						W_SETTINGS("number", file_name);
-					}
-				}
 				fclose(settings_file);
-				free(search_style); free(file_name);
 				printf("\nFrom now on files will be select from their order number.\n");
 				return SUCCESS;
 			}
@@ -68,6 +45,21 @@ int settings_menu(){
 					printf("\n==================================\n");
 				}
 			}
+		}
+
+		if(main_decision == 2){
+			printf("This page is still on development.");
+			printf("\n==================================\n");
+		}
+
+		if(main_decision == 3){
+			printf("This page is still on development.");
+			printf("\n==================================\n");
+		}
+
+		if(main_decision == 4){
+			printf("This page is still on development.");
+			printf("\n==================================\n");
 		}
 
 		if(main_decision == 5){

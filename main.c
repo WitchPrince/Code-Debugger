@@ -9,7 +9,7 @@ int main(int argc, char *argv[]){
 	search_style = malloc(sizeof(char) * 8);
 
 	FILE *settings_file = fopen(SETTINGS_FILE, "r");
-	R_SETTINGS(search_style, file_name);
+	fscanf(settings_file, "File search style: %[^\n]\nDefault file: %[^\n]\n", search_style, file_name);
 	fclose(settings_file);
 
 	char db_path[sizeof(DATABASE) + 64];

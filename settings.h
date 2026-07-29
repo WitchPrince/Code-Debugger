@@ -22,12 +22,6 @@
 #define CLEAR_BEFORE_EXIT for(int i = 0; list[i] != NULL; i++) free(list[i]);\
 	free(list);
 
-#define R_SETTINGS(search_style, file_name) fscanf(settings_file, "File search style: %" STR(FILE_NAME_LIMIT) "[\n]\nDefault file: %[^\n]\n", search_style, file_name);
-#define W_SETTINGS(search_style, file_name) fprintf(settings_file, "File search style: %s\nDefault file: %s\n", file_name, search_style);
-
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
-
 //Filepaths
 #define DATABASE "/usr/local/share/error_finder_database"
 #define KERNEL	"/usr/local/share/error_finder_database/checkpatch.pl"
