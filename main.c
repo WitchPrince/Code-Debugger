@@ -1,15 +1,17 @@
 #include "settings.h"
 
 bool secretFiles = false;
+char *hidden_files = NULL;
 char *file_name = NULL;
 char *search_style = NULL;
 
 int main(int argc, char *argv[]){
 	file_name = malloc(sizeof(char) * FILE_NAME_LIMIT);
 	search_style = malloc(sizeof(char) * 8);
+	hidden_files = malloc(sizeof(char) * 4);
 
 	FILE *settings_file = fopen(SETTINGS_FILE, "r");
-	fscanf(settings_file, "File search style: %[^\n]\nDefault file: %[^\n]\n", search_style, file_name);
+	fscanf(settings_file, "File search style: %[^\n]\nDefault file: %[^\n]\nHidden Files: %[^\n]\n", search_style, file_name, hidden_files);
 	fclose(settings_file);
 
 	char db_path[sizeof(DATABASE) + 64];
@@ -46,6 +48,10 @@ int main(int argc, char *argv[]){
 		else if(decision_1 == 3){
 			printf("\n==================================\n");
 			settings_menu();
+			
+			settings_file = fopen(SETTINGS_FILE, "r");
+			fscanf(settings_file, "File search style: %[^\n]\nDefault file: %[^\n]\nHidden Files: %[^\n]\n", search_style, file_name, hidden_files);
+			fclose(settings_file);
 		}
 
 		else{
@@ -56,6 +62,7 @@ int main(int argc, char *argv[]){
 		}
 	}
 
+	free(hidden_files);
 	free(file_name);
 	free(search_style);
 	CLEAR_BEFORE_EXIT;

@@ -1,10 +1,13 @@
 #include "../settings.h"
 
 int settings_menu(){
-	FILE *settings_file = NULL;
+	FILE *settings_file = fopen(SETTINGS_FILE, "r");
+	fscanf(settings_file, "File search style: %[^\n]\nDefault file: %[^\n]\nHidden Files: %[^\n]\n", search_style, file_name, hidden_files);
 	int decision, main_decision;
+	fclose(settings_file);
+
 	while(1){
-		printf("\n(1) File search format\n(2) Change default script file\n(3) Add a script file to database\n(4) Delete a script file from database\n(5) Exit\nDecision: ");
+		printf("\n(1) File search format\n(2) Change default script file\n(3) Add a script file to database\n(4) Delete a script file from database\n(5) Show/Hide hidden files\n(6) Exit\nDecision: ");
 		scanf("%d", &main_decision);
 		printf("\n==================================\n");
 		
@@ -19,7 +22,7 @@ int settings_menu(){
 					fprintf(stderr, "Settings file couldn't opened.\n");
 					return ERROR;
 				}
-				fprintf(settings_file, "File search style: name\nDefault file: %s\n", file_name);
+				fprintf(settings_file, "File search style: name\nDefault file: %s\nHidden Files: %s\n", file_name, hidden_files);
 
 				fclose(settings_file);
 				printf("\nFrom now on files will be select from their exact name.\n");
@@ -63,6 +66,11 @@ int settings_menu(){
 		}
 
 		if(main_decision == 5){
+			printf("This page is still on development.");
+			printf("\n==================================\n");		
+		}
+
+		if(main_decision == 6){
 			printf("\n==================================\n");
 			return SUCCESS;
 		}

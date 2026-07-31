@@ -13,6 +13,7 @@
   (1) SETTINGS_FILE:
   File search style: %s
   Default file: %s
+  Hidden Files: %s
 
 */
 //Macros
@@ -31,6 +32,7 @@
 extern bool secretFiles;
 extern char *file_name;
 extern char *search_style;
+extern char *hidden_files;
 
 //Functions
 char **parser(char *target); 
