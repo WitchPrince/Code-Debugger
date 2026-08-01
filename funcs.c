@@ -62,3 +62,59 @@ char **parser(char *target){
 
 	return file_names;
 }
+
+int file_copy(char *src_file, char *dest_path){
+	FILE *src = fopen(src_file, "rb");
+
+	if(src == NULL){
+		fprintf(stderr, "Source file couldn't opened. Now trying it wia 'sudo cp' command now.\n\n");
+		return -1;
+	}
+
+	FILE *dest = fopen(dest_path, "wb");
+	if(dest == NULL){
+		fprintf(stderr, "Destination file couldn't created. Trying it wia 'sudo cp' command now.\n\n");
+		fclose(src);
+		return -1;
+	}
+
+	char buffer[4096];
+	size_t bytes_read;
+
+	while((bytes_read = fread(buffer, 1, sizeof(buffer), src)) > 0){
+		size_t bytes_written = fwrite(buffer, 1, sizeof(buffer), dest);
+
+		if(bytes_written != bytes_read){
+			fprintf(stderr, "There has been a mistake while writing to the destination file!");
+			fclose(src);
+			fclose(dest);
+			return -1;
+		}
+	}
+
+	fclose(src);
+	fclose(dest);
+	
+	return 0;
+}
+
+char *path_to_name(char *file_path){
+	int i = 0, count = 0;
+	char *file_name = malloc(sizeof(char) * FILE_NAME_LIMIT);
+
+	while(file_path[i] != '\0'){
+		if(file_path[i] == '/'){
+			count++;
+		}
+		i++;
+	}
+
+	i = 0;
+	while(file_path[count] != '\0'){
+		file_name[i] = file_path[count];
+		i++;
+		count++;
+	}
+	file_name[i + 1] = '\0';
+	return file_name;
+}
