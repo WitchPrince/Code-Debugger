@@ -20,14 +20,13 @@
 #define ERROR 1
 #define SUCCESS 0
 #define FILE_NAME_LIMIT 1024
-#define CLEAR_BEFORE_EXIT for(int i = 0; list[i] != NULL; i++) free(list[i]);\
+#define CLEAR_BEFORE_EXIT(list) for(int i = 0; list[i] != NULL; i++) free(list[i]);\
 	free(list);
 
 //Filepaths
-#define DATABASE "/usr/local/share/error_finder_database"
-#define FILE_DB "/usr/local/share/error_finder_database/files"
-#define KERNEL	"/usr/local/share/error_finder_database/checkpatch.pl"
-#define SETTINGS_FILE "/usr/local/share/error_finder_database/settings.txt"
+extern char DATABASE[1024];		//Path: ~/.local/share/error_finder_database/
+extern char FILE_DB[1024];		//Path: ~/.local/share/error_finder_database/files/
+extern char SETTINGS_FILE[1024];	//Path: ~/.local/share/error_finder_database/settings.txt
 
 //Global Variables
 extern bool secretFiles;
@@ -37,9 +36,13 @@ extern char *hidden_files;
 
 //Functions
 char **parser(char *target); 
+char *path_to_name(char *name);
+char *name_to_path(char *name);
+
 int settings_menu();
 int file_copy(char *src_file, char *dest_path);
+
+void init_paths();
 void run_script(char **list);
-char *path_to_name(char *file_path);
 
 #endif

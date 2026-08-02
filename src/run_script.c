@@ -63,7 +63,7 @@ void run_script(char **list){
 	}
 
 	else{
-		fprintf(stderr, "Check settings.txt file from '/usr/local/share/error_finder_database/settings.txt', because it seems it's corrupted. You can go to settings menu and re-configure it.\n");
+		fprintf(stderr, "Check settings.txt file from '~/.local/share/error_finder_database/settings.txt', because it seems it's corrupted. You can go to settings menu and re-configure it.\n");
 		free(run_file);
 	}
 }

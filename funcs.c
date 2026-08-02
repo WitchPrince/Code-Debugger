@@ -11,10 +11,11 @@ char **parser(char *target){
 	}
 
 	else{
-		char *db = malloc(strlen(DATABASE) + strlen(target));
-		snprintf(db, sizeof(db), "./");
-		snprintf(db, sizeof(db), DATABASE);
-		snprintf(db, sizeof(db), target);
+		size_t buffer = strlen(DATABASE) + strlen(target);
+		char *db = malloc(buffer);
+		snprintf(db, buffer, "./");
+		snprintf(db, buffer, DATABASE);
+		snprintf(db, buffer, target);
 	
 		dir = opendir(db);
 		if(dir == NULL){
@@ -98,9 +99,10 @@ int file_copy(char *src_file, char *dest_path){
 	return 0;
 }
 
+//This func is for extracting names from file paths for adding them to database
 char *path_to_name(char *file_path){
 	int i = 0, count = 0;
-	char *file_name = malloc(sizeof(char) * FILE_NAME_LIMIT);
+	char *name = malloc(sizeof(char) * FILE_NAME_LIMIT);
 
 	while(file_path[i] != '\0'){
 		if(file_path[i] == '/'){
@@ -111,10 +113,33 @@ char *path_to_name(char *file_path){
 
 	i = 0;
 	while(file_path[count] != '\0'){
-		file_name[i] = file_path[count];
+		name[i] = file_path[count];
 		i++;
 		count++;
 	}
-	file_name[i + 1] = '\0';
-	return file_name;
+	name[i] = '\0';
+	return name;
+}
+
+//This func is for creating paths as strings.
+char *name_to_path(char *name){
+	size_t buffer = sizeof(char) * FILE_NAME_LIMIT;
+	char *path = malloc(buffer);
+	snprintf(path, buffer, "%s/%s", FILE_DB, name);
+	
+	return path;
+}
+
+void init_paths(){
+	char *home_dir = getenv("HOME");
+	if(home_dir == NULL){
+		fprintf(stderr, "Home directory couldn't found!\n\n");
+		free(file_name);
+		free(search_style);
+		free(hidden_files);
+	}
+
+	snprintf(DATABASE, 1024, "%s/.local/share/error_finder_database", home_dir);
+	snprintf(FILE_DB, 1024, "%s/.local/share/error_finder_database/files", home_dir);
+	snprintf(SETTINGS_FILE, 1024, "%s/.local/share/error_finder_database/settings.txt", home_dir);
 }

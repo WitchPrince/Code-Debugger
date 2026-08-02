@@ -5,17 +5,23 @@ char *hidden_files = NULL;
 char *file_name = NULL;
 char *search_style = NULL;
 
+char DATABASE[1024];
+char FILE_DB[1024];
+char SETTINGS_FILE[1024];
+
 int main(int argc, char *argv[]){
 	file_name = malloc(sizeof(char) * FILE_NAME_LIMIT);
 	search_style = malloc(sizeof(char) * 8);
 	hidden_files = malloc(sizeof(char) * 4);
 
+	init_paths();
+
 	FILE *settings_file = fopen(SETTINGS_FILE, "r");
 	fscanf(settings_file, "File search style: %[^\n]\nDefault file: %[^\n]\nHidden Files: %[^\n]\n", search_style, file_name, hidden_files);
 	fclose(settings_file);
 
-	char db_path[sizeof(DATABASE) + 64];
-	snprintf(db_path, sizeof(db_path), DATABASE"%s", "checkpatch.pl"); //Selected file is "checkpatch.pl" by default. But I'll add a menu for choosing every file you want.
+	//char db_path[sizeof(DATABASE) + 64];
+	//snprintf(db_path, sizeof(db_path), DATABASE"%s", "checkpatch.pl"); //Selected file is "checkpatch.pl" by default. But I'll add a menu for choosing every file you want.
 
 	if(argc > 1){
 		if(strcmp(argv[1], "-a") == 0) secretFiles = true;
@@ -28,7 +34,7 @@ int main(int argc, char *argv[]){
 		printf("(1) List files\n(2) Use a script file\n(3) Settings\n(4) Exit\nDecision: ");
 		if(scanf("%d", &decision_1) != 1){
 			fprintf(stderr, "Only numbers please.");
-			CLEAR_BEFORE_EXIT;
+			CLEAR_BEFORE_EXIT(list);
 			exit(1);
 		}
 		printf("\n==================================\n");
@@ -65,6 +71,6 @@ int main(int argc, char *argv[]){
 	free(hidden_files);
 	free(file_name);
 	free(search_style);
-	CLEAR_BEFORE_EXIT;
+	CLEAR_BEFORE_EXIT(list);
 	return 0;
 }
