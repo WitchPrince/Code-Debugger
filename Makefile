@@ -2,15 +2,15 @@
 
 DB_DIR	=	~/.local/share/error_finder_database
 FILE_DB_DIR	=	~/.local/share/error_finder_database/files
-SRCS	=	main.c	funcs.c	src/settings_file.c	src/run_script.c	settings.h	-o	ef
+SRCS	=	main.c	src/funcs.c	src/settings_file.c	src/run_script.c	settings.h	-o	ef
 
 install:
-	@gcc	$(SRCS)
-	@cp	ef	~/.local/bin/
-	@echo	"Application has been created!"
 	@mkdir	-p	$(DB_DIR)
 	@mkdir	-p	$(FILE_DB_DIR)
-	@touch	$(DB_DIR)/settings.txt
+	@gcc	$(SRCS)
+	@cp	ef	~/.local/bin/
+	@cp	src/console_commands.txt	~/.local/share/error_finder_database/
+	@echo	"Application has been created!"
 	@echo	-e	"File search style: number\nDefault file: ~/.local/share/error_finder_database/files/checkpatch.pl\nHidden Files: no\n" > $(DB_DIR)/settings.txt
 
 clean:

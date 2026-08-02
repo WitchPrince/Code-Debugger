@@ -20,13 +20,15 @@
 #define ERROR 1
 #define SUCCESS 0
 #define FILE_NAME_LIMIT 1024
-#define CLEAR_BEFORE_EXIT(list) for(int i = 0; list[i] != NULL; i++) free(list[i]);\
-	free(list);
+#define CLEAR_BEFORE_EXIT(list) for(int i = 0; list[i] != NULL; i++) {free(list[i]);\
+					free(db_file_list[i]);}\
+				free(list); free(db_file_list);
 
 //Filepaths
 extern char DATABASE[1024];		//Path: ~/.local/share/error_finder_database/
 extern char FILE_DB[1024];		//Path: ~/.local/share/error_finder_database/files/
 extern char SETTINGS_FILE[1024];	//Path: ~/.local/share/error_finder_database/settings.txt
+extern char **db_file_list;
 
 //Global Variables
 extern bool secretFiles;
@@ -44,5 +46,6 @@ int file_copy(char *src_file, char *dest_path);
 
 void init_paths();
 void run_script(char **list);
+void console_mode();
 
 #endif

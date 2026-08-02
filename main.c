@@ -5,6 +5,7 @@ char *hidden_files = NULL;
 char *file_name = NULL;
 char *search_style = NULL;
 
+char **db_file_list;
 char DATABASE[1024];
 char FILE_DB[1024];
 char SETTINGS_FILE[1024];
@@ -20,8 +21,7 @@ int main(int argc, char *argv[]){
 	fscanf(settings_file, "File search style: %[^\n]\nDefault file: %[^\n]\nHidden Files: %[^\n]\n", search_style, file_name, hidden_files);
 	fclose(settings_file);
 
-	//char db_path[sizeof(DATABASE) + 64];
-	//snprintf(db_path, sizeof(db_path), DATABASE"%s", "checkpatch.pl"); //Selected file is "checkpatch.pl" by default. But I'll add a menu for choosing every file you want.
+	db_file_list = parser(FILE_DB);
 
 	if(argc > 1){
 		if(strcmp(argv[1], "-a") == 0) secretFiles = true;
@@ -30,12 +30,11 @@ int main(int argc, char *argv[]){
 	char **list = parser(".");
 	int decision_1 = 1, decision_file;
 
-	while(decision_1 != 4){
-		printf("(1) List files\n(2) Use a script file\n(3) Settings\n(4) Exit\nDecision: ");
+	while(decision_1 != 5){
+		printf("(1) List files\n(2) Use a script file\n(3) Settings\n(4) Console Mode\n(5) Exit\nDecision: ");
 		if(scanf("%d", &decision_1) != 1){
-			fprintf(stderr, "Only numbers please.");
-			CLEAR_BEFORE_EXIT(list);
-			exit(1);
+			fprintf(stderr, "Only numbers please.\n");
+			continue;
 		}
 		printf("\n==================================\n");
 
@@ -59,14 +58,29 @@ int main(int argc, char *argv[]){
 			settings_file = fopen(SETTINGS_FILE, "r");
 			fscanf(settings_file, "File search style: %[^\n]\nDefault file: %[^\n]\nHidden Files: %[^\n]\n", search_style, file_name, hidden_files);
 			fclose(settings_file);
+
+			for(int i = 0; db_file_list[i]; i++) free(db_file_list[i]);
+			free(db_file_list);
+			db_file_list = parser(FILE_DB);
 		}
 
+		else if(decision_1 == 4){
+			console_mode();
+
+			settings_file = fopen(SETTINGS_FILE, "r");
+			fscanf(settings_file, "File search style: %[^\n]\nDefault file: %[^\n]\nHidden Files: %[^\n]\n", search_style, file_name, hidden_files);
+			fclose(settings_file);
+			
+			printf("\n==================================\n");
+		}
+		
 		else{
-			if(decision_1 != 4) {
+			if(decision_1 != 5) {
 				printf("Can't you see the numbers?\nThere's not any choice like that idiot.");
 				printf("\n==================================\n");
 			}
 		}
+
 	}
 
 	free(hidden_files);

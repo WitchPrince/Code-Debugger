@@ -1,4 +1,4 @@
-#include "settings.h"
+#include "../settings.h"
 
 char **parser(char *target){
 	DIR *dir;
@@ -143,4 +143,77 @@ void init_paths(){
 	snprintf(DATABASE, 1024, "%s/.local/share/error_finder_database", home_dir);
 	snprintf(FILE_DB, 1024, "%s/.local/share/error_finder_database/files", home_dir);
 	snprintf(SETTINGS_FILE, 1024, "%s/.local/share/error_finder_database/settings.txt", home_dir);
+}
+
+void console_mode(){
+	size_t buffer = FILE_NAME_LIMIT * 4;
+	char *command = malloc(buffer);
+	printf("Type 'exit' for closing the console mode.\n\n");
+
+	size_t buffer2 = FILE_NAME_LIMIT * 1;
+	char *command_list_path = malloc(buffer2);
+	snprintf(command_list_path, buffer2, "%s/console_commands.txt", DATABASE);
+	FILE *command_list;
+	FILE *settings_file;
+
+	char *_dummy = malloc(sizeof(char) * 64);
+	char *name;
+	char *path;
+	bool exist = false;
+	int number;
+
+	while(1){
+		printf("\n> ");
+		scanf(" %[^\n]", command);
+		command_list = fopen(command_list_path, "r");
+		for(int i = 0; fscanf(command_list, "%s\n", _dummy) != EOF; i++){
+			if(strcmp(_dummy, command) == 0) exist = true;
+			if(exist == true) break;
+		}
+		fclose(command_list);
+		if(exist){
+			if(strcmp(command, "exit") == 0 || strcmp(command, "quit") == 0) break;
+
+			else if(strcmp(command, "default_file") == 0 || strcmp(command, "df") == 0){
+				printf("Please choose the default file from database.\n\n");
+
+				for(int i = 0; db_file_list[i]; i++){
+					printf("(%d) %s\n", i + 1, db_file_list[i]);
+				}
+
+				if(strcmp(search_style, "name") == 0) {
+					printf("File name: ");
+					scanf("%s", name);
+				}
+				else if(strcmp(search_style, "number") == 0){
+					printf("File number: ");
+					scanf("%d", &number);
+					name = db_file_list[number - 1];
+				}
+
+				path = name_to_path(name);
+				settings_file = fopen(path, "r");
+				if(settings_file == NULL){
+					printf("This file is not exist in database!");
+					free(path);
+					continue;
+				}
+				fclose(settings_file);
+				settings_file = fopen(SETTINGS_FILE, "w");
+				
+				fprintf(settings_file, "File search style: %s\nDefault file: %s\nHidden Files: %s", search_style, path, hidden_files);
+				fclose(settings_file);
+
+				printf("Default file has been changed to '%s'", name);
+			}
+			
+		}
+		else{
+			system(command);
+		}
+		exist = false;
+	}
+	free(_dummy);
+	free(command);
+	free(command_list_path);
 }
