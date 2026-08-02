@@ -11,7 +11,7 @@ install:
 	@mkdir	-p	$(DB_DIR)
 	@mkdir	-p	$(FILE_DB_DIR)
 	@touch	$(DB_DIR)/settings.txt
-	@echo	-e	"File search style: number\nDefault file: ~/.local/share/error_finder_database/files/checkpatch.pl\nHidden Files: 0\n" >> $(DB_DIR)/settings.txt
+	@echo	-e	"File search style: number\nDefault file: ~/.local/share/error_finder_database/files/checkpatch.pl\nHidden Files: no\n" > $(DB_DIR)/settings.txt
 
 clean:
 	@rm -f ef;

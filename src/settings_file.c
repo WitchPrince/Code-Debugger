@@ -110,7 +110,19 @@ int settings_menu(){
 		}
 
 		else if(main_decision == 3){
-			printf("This page is still on development.");
+			char *path = malloc(sizeof(char) * FILE_NAME_LIMIT);
+			printf("File path: ");
+			scanf("%s", path);
+			int error = file_copy(path, FILE_DB);
+			if(error == -1){
+				size_t buffer = sizeof(char) * FILE_NAME_LIMIT * 2 + 10;
+				char *command = malloc(buffer);
+				snprintf(command, buffer, "sudo cp %s %s", path, FILE_DB);
+				system(command);
+				free(command);
+			}
+			free(path);
+			printf("Copy success!");
 			printf("\n==================================\n");
 		}
 
@@ -177,7 +189,24 @@ int settings_menu(){
 		}
 
 		else if(main_decision == 5){
-			printf("This page is still on development.");
+			printf("Do you want to see secret files?\n(1/0): ");
+			int decision;
+			scanf("%d", &decision);
+
+			char *choice = decision ? "yes" : "no";
+
+			FILE *settings_file = fopen(SETTINGS_FILE, "w");
+			if(settings_file == NULL){
+				fprintf(stderr, "Settings file couldn't opened! Please run make command again.");
+				return ERROR;
+			}
+
+			else{
+				fprintf(settings_file, "File search style: %s\nDefault file: %s\nHidden Files: %s\n",search_style, file_name, choice);
+			}
+			fclose(settings_file);
+
+			printf("Secret files settings has been updated!");
 			printf("\n==================================\n");		
 		}
 
@@ -192,7 +221,7 @@ int settings_menu(){
 			char *home_dir = getenv("HOME");
 			char *default_file = malloc(sizeof(char) * FILE_NAME_LIMIT);
 			snprintf(default_file, sizeof(char) * FILE_NAME_LIMIT, "%s/checkpatch.pl", home_dir);
-			fprintf(fptr, "File search style: number\nDefault file: %s\nHidden Files: 0\n", default_file);
+			fprintf(fptr, "File search style: number\nDefault file: %s\nHidden Files: no\n", default_file);
 			
 			free(default_file);
 			fclose(fptr);

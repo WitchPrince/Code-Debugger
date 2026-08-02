@@ -26,6 +26,7 @@ char **parser(char *target){
 	}
 	struct dirent *dp;
 	int count = 0, capacity = 64;
+	bool secretFiles = !strcmp(hidden_files, "yes") ? 1 : 0;
 	
 	char **file_names = malloc(sizeof(char*) * capacity);
 	if(file_names == NULL){

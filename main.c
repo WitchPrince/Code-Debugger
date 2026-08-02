@@ -40,6 +40,7 @@ int main(int argc, char *argv[]){
 		printf("\n==================================\n");
 
 		if(decision_1 == 1){
+			list = parser(".");
 			for(int i = 0; list[i] != NULL; i++){
 				printf("(%d) %s\n", i + 1, list[i]);
 			}
