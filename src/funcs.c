@@ -159,22 +159,31 @@ void console_mode(){
 	char *_dummy = malloc(sizeof(char) * 64);
 	char *name;
 	char *path;
+	char **argv;
 	bool exist = false;
 	int number;
+
+	struct args argi;
 
 	while(1){
 		printf("\n> ");
 		scanf(" %[^\n]", command);
+		argi = console_parser(command);
+		free(command);
+		/*if(argi == NULL){//Idk how to do error control on structs but I'll figure it out on next update.
+			fprintf(stderr, "Console parser is not working! Check it out.");
+			break;
+		}*/
 		command_list = fopen(command_list_path, "r");
 		for(int i = 0; fscanf(command_list, "%s\n", _dummy) != EOF; i++){
-			if(strcmp(_dummy, command) == 0) exist = true;
+			if(!strcmp(_dummy, argi.argv[i])) exist = true;
 			if(exist == true) break;
 		}
 		fclose(command_list);
 		if(exist){
-			if(strcmp(command, "exit") == 0 || strcmp(command, "quit") == 0) break;
+			if(!strcmp(argi.argv[0], "exit") || !strcmp(argi.argv[0], "quit")) break;
 
-			else if(strcmp(command, "default_file") == 0 || strcmp(command, "df") == 0){
+			else if(!strcmp(argi.argv[0], "default_file") || !strcmp(argi.argv[0], "df")){
 				printf("Please choose the default file from database.\n\n");
 
 				for(int i = 0; db_file_list[i]; i++){
@@ -206,6 +215,24 @@ void console_mode(){
 
 				printf("Default file has been changed to '%s'", name);
 			}
+
+			else if(!strcmp(argi.argv[0], "error_finder") || !strcmp(argi.argv[0], "ef")){
+				if(argi.argc > 0){
+					char c;
+					for(int i = 0; i <= argi.argc; i++){
+						printf("Default script file (%s) is going to work on these files. Are you okay with this?\n(y / n): ", file_name);
+						scanf("%1c", c);
+						if(c == 'y' || c == 'Y'){
+							//I'll do this part later 'cause I'm tired asf...
+						}
+
+						else{
+							printf("\nProcess cancelled.\n");
+							break;
+						}
+					}
+				}
+			}
 			
 		}
 		else{
@@ -214,6 +241,38 @@ void console_mode(){
 		exist = false;
 	}
 	free(_dummy);
-	free(command);
 	free(command_list_path);
+}
+
+struct args console_parser(char *command){
+	struct args argi; //argi is like 'argument info'. It's much easier to remember this way. 
+	argi.argc = 0;
+	int count = 0;
+
+	for(int i = 0; command[i] != '\0'; i++){
+		if(command[i] == ' '){
+			argi.argc++;
+		}
+	}
+	argi.argc++;
+	argi.argc;
+	argi.argv = malloc(sizeof(char *) * argi.argc);
+	argi.argc = 0;
+
+	for(int i = 0; command[i] != '\0'; i++){
+		if(command[i] != ' '){
+			argi.argv[argi.argc] = malloc(sizeof(char) * FILE_NAME_LIMIT);
+			argi.argv[argi.argc][count] = command[i] ;
+			count++;
+		}
+		else{
+			argi.argv[argi.argc][count] = '\0';
+			argi.argc++;
+			count = 0;
+		}
+	}
+
+	argi.argv[argi.argc][count] = '\0';
+
+	return argi;
 }

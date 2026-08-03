@@ -2,3 +2,5 @@ exit
 quit
 default_file
 df
+error_finder
+ef

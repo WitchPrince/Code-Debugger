@@ -16,6 +16,13 @@
   Hidden Files: %s
 
 */
+
+//Structs
+struct args{
+	char **argv;
+	int argc;
+};
+
 //Macros
 #define ERROR 1
 #define SUCCESS 0
@@ -47,5 +54,7 @@ int file_copy(char *src_file, char *dest_path);
 void init_paths();
 void run_script(char **list);
 void console_mode();
+
+struct args console_parser(char *command);
 
 #endif
