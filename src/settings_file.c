@@ -148,7 +148,7 @@ int settings_menu(){
 				free(script_list);
 
 				if(check){
-					char *wanted_path = name_to_path(wanted);
+					char *wanted_path = name_to_path(wanted, FILE_DB);
 					remove(wanted_path);
 					printf("%s file has been deleted!", wanted);
 					free(wanted_path);
@@ -165,7 +165,7 @@ int settings_menu(){
 				scanf("%d", &script_no);
 
 				if(script_list[script_no - 1] != NULL){
-					char *wanted = name_to_path(script_list[script_no - 1]);
+					char *wanted = name_to_path(script_list[script_no - 1], FILE_DB);
 					remove(wanted);
 					printf("%s file has been deleted!\n\n", wanted);
 					free(wanted);

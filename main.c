@@ -8,6 +8,7 @@ char *search_style = NULL;
 char **db_file_list;
 char DATABASE[1024];
 char FILE_DB[1024];
+char LOG_DB[1024];
 char SETTINGS_FILE[1024];
 
 int main(int argc, char *argv[]){
@@ -24,7 +25,42 @@ int main(int argc, char *argv[]){
 	db_file_list = parser(FILE_DB);
 
 	if(argc > 1){
-		if(strcmp(argv[1], "-a") == 0) secretFiles = true;
+		int run = 0;
+		int console = 0;
+		for(int i = 1; i < argc; i++){
+			if(strcmp(argv[i], "-a") == 0){ 
+				secretFiles = true;
+				run = 1;
+			}
+			if(!strcmp(argv[i], "-cm") || !strcmp(argv[1], "console-mode")){
+				run = 1;
+				console = 1;
+			} 
+		}
+
+		if(run){
+			if(console){
+				console_mode();
+				
+				free(hidden_files);
+				free(file_name);
+				free(search_style);
+				CLEAR_BEFORE_EXIT(db_file_list);
+				
+				exit(1);
+			}	
+		}
+
+		else{
+			printf("There's probably a typo. Please check your command again.");
+			
+			free(hidden_files);
+			free(file_name);
+			free(search_style);
+			CLEAR_BEFORE_EXIT(db_file_list);
+			
+			exit(1);
+		}
 	}
 
 	char **list = parser(".");
@@ -87,5 +123,6 @@ int main(int argc, char *argv[]){
 	free(file_name);
 	free(search_style);
 	CLEAR_BEFORE_EXIT(list);
+	CLEAR_BEFORE_EXIT(db_file_list);
 	return 0;
 }

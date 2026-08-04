@@ -26,7 +26,6 @@ char **parser(char *target){
 	}
 	struct dirent *dp;
 	int count = 0, capacity = 64;
-	bool secretFiles = !strcmp(hidden_files, "yes") ? 1 : 0;
 	
 	char **file_names = malloc(sizeof(char*) * capacity);
 	if(file_names == NULL){
@@ -102,31 +101,37 @@ int file_copy(char *src_file, char *dest_path){
 
 //This func is for extracting names from file paths for adding them to database
 char *path_to_name(char *file_path){
-	int i = 0, count = 0;
+	int i = 0, count = 0, i_last;
 	char *name = malloc(sizeof(char) * FILE_NAME_LIMIT);
 
 	while(file_path[i] != '\0'){
 		if(file_path[i] == '/'){
 			count++;
+			i_last = i;
 		}
 		i++;
 	}
 
+	//Example: /home/prince/script.sh
 	i = 0;
-	while(file_path[count] != '\0'){
-		name[i] = file_path[count];
+	i_last++;
+	while(file_path[i_last] != '\0'){
+		name[i] = file_path[i_last];
+		i_last++;
 		i++;
-		count++;
 	}
 	name[i] = '\0';
 	return name;
 }
 
 //This func is for creating paths as strings.
-char *name_to_path(char *name){
+char *name_to_path(char *name, char *main_dir){
 	size_t buffer = sizeof(char) * FILE_NAME_LIMIT;
 	char *path = malloc(buffer);
-	snprintf(path, buffer, "%s/%s", FILE_DB, name);
+	if(!strcmp(main_dir, LOG_DB)){
+		snprintf(path, buffer, "%s/%s-log.txt", LOG_DB, name);
+	}
+	snprintf(path, buffer, "%s/%s", main_dir, name);
 	
 	return path;
 }
@@ -143,14 +148,15 @@ void init_paths(){
 	snprintf(DATABASE, 1024, "%s/.local/share/error_finder_database", home_dir);
 	snprintf(FILE_DB, 1024, "%s/.local/share/error_finder_database/files", home_dir);
 	snprintf(SETTINGS_FILE, 1024, "%s/.local/share/error_finder_database/settings.txt", home_dir);
+	snprintf(LOG_DB, 1024, "%s/.local/share/error_finder_database/logs", home_dir);
 }
 
 void console_mode(){
-	size_t buffer = FILE_NAME_LIMIT * 4;
+	size_t buffer = sizeof(char) * FILE_NAME_LIMIT * 4;
 	char *command = malloc(buffer);
 	printf("Type 'exit' for closing the console mode.\n\n");
 
-	size_t buffer2 = FILE_NAME_LIMIT * 1;
+	size_t buffer2 = sizeof(char) * (FILE_NAME_LIMIT * 1);
 	char *command_list_path = malloc(buffer2);
 	snprintf(command_list_path, buffer2, "%s/console_commands.txt", DATABASE);
 	FILE *command_list;
@@ -160,23 +166,23 @@ void console_mode(){
 	char *name;
 	char *path;
 	char **argv;
-	bool exist = false;
+	bool exist;
 	int number;
 
 	struct args argi;
 
 	while(1){
+		exist = false;
 		printf("\n> ");
 		scanf(" %[^\n]", command);
 		argi = console_parser(command);
-		free(command);
 		/*if(argi == NULL){//Idk how to do error control on structs but I'll figure it out on next update.
 			fprintf(stderr, "Console parser is not working! Check it out.");
 			break;
 		}*/
 		command_list = fopen(command_list_path, "r");
 		for(int i = 0; fscanf(command_list, "%s\n", _dummy) != EOF; i++){
-			if(!strcmp(_dummy, argi.argv[i])) exist = true;
+			if(!strcmp(_dummy, argi.argv[0])) exist = true;
 			if(exist == true) break;
 		}
 		fclose(command_list);
@@ -200,7 +206,7 @@ void console_mode(){
 					name = db_file_list[number - 1];
 				}
 
-				path = name_to_path(name);
+				path = name_to_path(name, FILE_DB);
 				settings_file = fopen(path, "r");
 				if(settings_file == NULL){
 					printf("This file is not exist in database!");
@@ -217,29 +223,58 @@ void console_mode(){
 			}
 
 			else if(!strcmp(argi.argv[0], "error_finder") || !strcmp(argi.argv[0], "ef")){
-				if(argi.argc > 0){
-					char c;
-					for(int i = 0; i <= argi.argc; i++){
-						printf("Default script file (%s) is going to work on these files. Are you okay with this?\n(y / n): ", file_name);
-						scanf("%1c", c);
-						if(c == 'y' || c == 'Y'){
+				if(argi.argc > 1){
+					int ch;
+					printf("Default script file (%s) is going to work on these files. Are you okay with this?\n(y / n): ", file_name);
+					getchar();
+					ch = getchar();
+				
+					if(ch == 'y' || ch == 'Y'){
+						char *worker = malloc(buffer);
+						char *work;
+						FILE *log;
+						for(int i = 1; i < argi.argc; i++){
 							//I'll do this part later 'cause I'm tired asf...
-						}
+							char *name_helper = path_to_name(argi.argv[i]);
+							work = name_to_path(name_helper, LOG_DB);
+							free(name_helper);
+							snprintf(worker, buffer, "%s %s >> %s 2>&1", file_name, argi.argv[i], work);
+							int status = system(worker);
 
-						else{
+							if(status == 0){
+								printf("%s file has been checked and logged. Please check log file.", work);
+							}
+							else{
+								log = fopen(work, "r");
+								if(log == NULL){
+									printf("Error! Log file couldn't created! Please check '~/.local/share/error_finder/database' directory permissions.\n");
+									break;
+								}
+								fclose(log);
+								fprintf(stderr, "Error! Please check the log file.");
+							}
+							free(work);
+						}
+						free(worker);
+					}
+					else{
 							printf("\nProcess cancelled.\n");
 							break;
-						}
 					}
 				}
+				else{
+					printf("Usage: ef <FILE_PATH>\n");
+				}
 			}
-			
 		}
 		else{
 			system(command);
 		}
-		exist = false;
+
+		for(int i = 0; argi.argv[i] != NULL; i++) free(argi.argv[i]);
+		free(argi.argv);
 	}
+	free(command);
 	free(_dummy);
 	free(command_list_path);
 }
@@ -255,13 +290,16 @@ struct args console_parser(char *command){
 		}
 	}
 	argi.argc++;
-	argi.argc;
-	argi.argv = malloc(sizeof(char *) * argi.argc);
+	argi.argv = malloc(sizeof(char *) * (argi.argc + 1));
+
+	for(int i = 0; i < argi.argc; i++){
+		argi.argv[i] = malloc(sizeof(char) * FILE_NAME_LIMIT);
+	}
+
 	argi.argc = 0;
 
 	for(int i = 0; command[i] != '\0'; i++){
 		if(command[i] != ' '){
-			argi.argv[argi.argc] = malloc(sizeof(char) * FILE_NAME_LIMIT);
 			argi.argv[argi.argc][count] = command[i] ;
 			count++;
 		}
@@ -273,6 +311,9 @@ struct args console_parser(char *command){
 	}
 
 	argi.argv[argi.argc][count] = '\0';
+	argi.argc++;
+
+	argi.argv[argi.argc] = NULL;
 
 	return argi;
 }

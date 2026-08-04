@@ -2,11 +2,13 @@
 
 DB_DIR	=	~/.local/share/error_finder_database
 FILE_DB_DIR	=	~/.local/share/error_finder_database/files
+LOG_DB_DIR	=	~/.local/share/error_finder_database/logs
 SRCS	=	main.c	src/funcs.c	src/settings_file.c	src/run_script.c	settings.h	-o	ef
 
 install:
 	@mkdir	-p	$(DB_DIR)
 	@mkdir	-p	$(FILE_DB_DIR)
+	@mkdir	-p	$(LOG_DB_DIR)
 	@gcc	$(SRCS)
 	@cp	ef	~/.local/bin/
 	@cp	src/console_commands.txt	~/.local/share/error_finder_database/

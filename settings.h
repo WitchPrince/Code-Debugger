@@ -27,13 +27,13 @@ struct args{
 #define ERROR 1
 #define SUCCESS 0
 #define FILE_NAME_LIMIT 1024
-#define CLEAR_BEFORE_EXIT(list) for(int i = 0; list[i] != NULL; i++) {free(list[i]);\
-					free(db_file_list[i]);}\
-				free(list); free(db_file_list);
+#define CLEAR_BEFORE_EXIT(list) for(int i = 0; list[i] != NULL; i++) free(list[i]);\
+				free(list);
 
 //Filepaths
-extern char DATABASE[1024];		//Path: ~/.local/share/error_finder_database/
-extern char FILE_DB[1024];		//Path: ~/.local/share/error_finder_database/files/
+extern char DATABASE[1024];		//Path: ~/.local/share/error_finder_database
+extern char FILE_DB[1024];		//Path: ~/.local/share/error_finder_database/files
+extern char LOG_DB[1024];		//Path: ~/.local/share/error_finder_database/logs
 extern char SETTINGS_FILE[1024];	//Path: ~/.local/share/error_finder_database/settings.txt
 extern char **db_file_list;
 
@@ -46,7 +46,7 @@ extern char *hidden_files;
 //Functions
 char **parser(char *target); 
 char *path_to_name(char *name);
-char *name_to_path(char *name);
+char *name_to_path(char *name, char *main_dir);
 
 int settings_menu();
 int file_copy(char *src_file, char *dest_path);
