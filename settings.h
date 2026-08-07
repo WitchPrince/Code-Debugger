@@ -26,8 +26,9 @@ struct args{
 //Macros
 #define ERROR 1
 #define SUCCESS 0
+#define READER_APP "glow"
 #define FILE_NAME_LIMIT 1024
-#define CLEAR_BEFORE_EXIT(list) for(int i = 0; list[i] != NULL; i++) free(list[i]);\
+#define FREE_LIST(list) for(int i = 0; list[i] != NULL; i++) free(list[i]);\
 				free(list);
 
 //Filepaths

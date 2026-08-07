@@ -11,9 +11,10 @@ install:
 	@mkdir	-p	$(LOG_DB_DIR)
 	@gcc	$(SRCS)
 	@cp	ef	~/.local/bin/
-	@cp	src/console_commands.txt	~/.local/share/error_finder_database/
+	@cp files_to_copy/settings.txt	$(DB_DIR)
+	@cp	files_to_copy/console_commands.txt	$(DB_DIR)
+	@cp	files_to_copy/cstyle.pl	$(FILE_DB_DIR)
 	@echo	"Application has been created!"
-	@echo	-e	"File search style: number\nDefault file: ~/.local/share/error_finder_database/files/checkpatch.pl\nHidden Files: no\n" > $(DB_DIR)/settings.txt
 
 clean:
 	@rm -f ef;

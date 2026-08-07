@@ -1,0 +1,4 @@
+File search style: number
+Default file: ~/.local/share/error_finder_database/files/cstyle.pl
+Hidden Files: no
+

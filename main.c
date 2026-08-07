@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
 				free(hidden_files);
 				free(file_name);
 				free(search_style);
-				CLEAR_BEFORE_EXIT(db_file_list);
+				FREE_LIST(db_file_list);
 				
 				exit(1);
 			}	
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
 			free(hidden_files);
 			free(file_name);
 			free(search_style);
-			CLEAR_BEFORE_EXIT(db_file_list);
+			FREE_LIST(db_file_list);
 			
 			exit(1);
 		}
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]){
 	free(hidden_files);
 	free(file_name);
 	free(search_style);
-	CLEAR_BEFORE_EXIT(list);
-	CLEAR_BEFORE_EXIT(db_file_list);
+	FREE_LIST(list);
+	FREE_LIST(db_file_list);
 	return 0;
 }

@@ -112,9 +112,8 @@ char *path_to_name(char *file_path){
 		i++;
 	}
 
-	//Example: /home/prince/script.sh
 	i = 0;
-	i_last++;
+	i_last;
 	while(file_path[i_last] != '\0'){
 		name[i] = file_path[i_last];
 		i_last++;
@@ -128,9 +127,6 @@ char *path_to_name(char *file_path){
 char *name_to_path(char *name, char *main_dir){
 	size_t buffer = sizeof(char) * FILE_NAME_LIMIT;
 	char *path = malloc(buffer);
-	if(!strcmp(main_dir, LOG_DB)){
-		snprintf(path, buffer, "%s/%s-log.txt", LOG_DB, name);
-	}
 	snprintf(path, buffer, "%s/%s", main_dir, name);
 	
 	return path;
@@ -189,7 +185,7 @@ void console_mode(){
 		if(exist){
 			if(!strcmp(argi.argv[0], "exit") || !strcmp(argi.argv[0], "quit")) break;
 
-			else if(!strcmp(argi.argv[0], "default_file") || !strcmp(argi.argv[0], "df")){
+			else if(!strcmp(argi.argv[0], "df") || !strcmp(argi.argv[0], "default_file")){
 				printf("Please choose the default file from database.\n\n");
 
 				for(int i = 0; db_file_list[i]; i++){
@@ -222,7 +218,7 @@ void console_mode(){
 				printf("Default file has been changed to '%s'", name);
 			}
 
-			else if(!strcmp(argi.argv[0], "error_finder") || !strcmp(argi.argv[0], "ef")){
+			else if(!strcmp(argi.argv[0], "ef") || !strcmp(argi.argv[0], "error_finder")){
 				if(argi.argc > 1){
 					int ch;
 					printf("Default script file (%s) is going to work on these files. Are you okay with this?\n(y / n): ", file_name);
@@ -234,24 +230,27 @@ void console_mode(){
 						char *work;
 						FILE *log;
 						for(int i = 1; i < argi.argc; i++){
-							//I'll do this part later 'cause I'm tired asf...
 							char *name_helper = path_to_name(argi.argv[i]);
 							work = name_to_path(name_helper, LOG_DB);
 							free(name_helper);
-							snprintf(worker, buffer, "%s %s >> %s 2>&1", file_name, argi.argv[i], work);
+							snprintf(worker, buffer, "%s %s >> %s-log.md 2>&1", file_name, argi.argv[i], work);
+							char *log_file = malloc(sizeof(char) * FILE_NAME_LIMIT);
+							snprintf(log_file, buffer2, "%s-log.md", work);
 							int status = system(worker);
 
+							log = fopen(log_file, "r");
+							if(log == NULL){
+								printf("Error! Log file couldn't created! Please check '%s' directory permissions.", LOG_DB);
+								free(work);
+								free(log_file);
+								break;
+							}
+							free(log_file);
 							if(status == 0){
-								printf("%s file has been checked and logged. Please check log file.", work);
+								printf("%s file has been checked and logged. File is all clean!", work);
 							}
 							else{
-								log = fopen(work, "r");
-								if(log == NULL){
-									printf("Error! Log file couldn't created! Please check '~/.local/share/error_finder/database' directory permissions.\n");
-									break;
-								}
-								fclose(log);
-								fprintf(stderr, "Error! Please check the log file.");
+								fprintf(stderr, "%s file has been checked and logged. Some errors found on file. Please check the log file.", work);
 							}
 							free(work);
 						}
@@ -267,13 +266,48 @@ void console_mode(){
 				}
 			}
 		}
+
+		else if(!strcmp(argi.argv[0], "logs")){
+			printf("\nLogs directory:\n\n");
+			char **log_directory = parser(LOG_DB);
+			for(int i = 0; log_directory[i] != NULL; i++){
+				printf("(%d) %s\n", i + 1, log_directory[i]);
+			}
+			printf("\nTo inspect a log file please use 'logs -i' or 'logs --inspect'format!\n\n");
+
+			if(argi.argc == 2){
+				if(!strcmp(argi.argv[1], "-i") || !strcmp(argi.argv[1], "--inspect")){
+					char *log_file = malloc(sizeof(char) * FILE_NAME_LIMIT);
+				
+					if(!strcmp(search_style, "name")){
+						printf("Name of the log file: ");
+						scanf("%s", log_file);	
+					}
+					else if(!strcmp(search_style, "number")){
+						int number;
+						printf("Sequence number of the log file: ");
+						scanf("%d", &number);
+						strcpy(log_file, log_directory[number - 1]);
+					}
+
+					char *reader = malloc(buffer2);
+
+					snprintf(reader, buffer2, "%s %s/%s", READER_APP, LOG_DB, log_file);
+					system(reader);
+			
+					free(reader);
+					free(log_file);
+				}
+			}
+			FREE_LIST(log_directory);
+		}
+
 		else{
 			system(command);
 		}
-
-		for(int i = 0; argi.argv[i] != NULL; i++) free(argi.argv[i]);
-		free(argi.argv);
 	}
+	
+	FREE_LIST(argi.argv);
 	free(command);
 	free(_dummy);
 	free(command_list_path);
